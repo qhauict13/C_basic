@@ -28,6 +28,7 @@ char *partcut(char *ex){
 int cmp(const void *a, const void *b){
   char *a1 = ((wordCount*)a)->word;
   char *b1 = ((wordCount*)b)->word;
+  printf("%s - %s\n",a1,b1);
   return strcmp(a1,b1);
 }
 
@@ -50,7 +51,10 @@ void insertNode(bnode **root, void *e){
 
 //---------print nodes and tree in various ways----------
 void printNode(bnode *node){
-  if(node == NULL) return;
+  if(node == NULL) {
+    fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
+    return;
+  }
   char *e = ((wordCount*)(node->value))->word;
   int e1 = ((wordCount*)(node->value))->count;
   printf("%s(%d)\n",e,e1);
@@ -86,28 +90,41 @@ int main(){
     fprintf(stderr,"Cannot open file!\n");
     exit(1);
   }
+  int i = 0;
     bnode *root = NULL;
     char str[MAX];
     char *part = NULL;
     bnode *temp;
-    wordCount a,b;
     if(fgets(str,MAX,file) != NULL) printf("\n");
+    char ex[MAX];
+    strcpy(ex,str);
+    while(ex != NULL){
+      part = partcut(ex);
+      i++;
+    }
+    printf("%d\n",i);
+
+    wordCount *b = malloc(i*sizeof(wordCount));
+    part = NULL; i = 0;
+
+
 
     while(str != NULL){
       if(root == NULL){
         part = partcut(str);
         if(part == NULL) break;
-        strcpy(a.word,part);
-        a.count = 0;
-        insertNode(&root,(void*)&a);
+        strcpy(b[i].word,part);
+        b[i].count = 0;
+        insertNode(&root,(void*)&b[i]);
+        printNode(root);
       } else {
         part = partcut(str);
-        if(part == NULL) break; //
+        if(part == NULL) break;
 
-        strcpy(a.word,part);
-        a.count = 0;
-        printNode(root);
-        temp = search(root,(void*)&a);/*
+        strcpy(b[i].word,part);
+        b[i].count = 0;
+        temp = search(root,(void*)&b[i]);
+        /*
         if(temp == NULL) {
           insertNode(&root,(void*)&a);
         }
@@ -120,8 +137,10 @@ int main(){
           insertNode(&root,(void*)&b);
           }*/
       }
+      i++;
     }
     printf("Inorder traversal: \n");
+    free(b);
     //inorder(root);
     freeAll(root);
   return 0;
