@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 1000
+
+int main(int argc, char *argv[]){
+  FILE *file;
+  if((file = fopen("american-english","r")) == NULL) printf("Cannot open text file!\n");
+  else {
+
+  }
+  return 0;
+}
+
+int binary_search(FILE *file, char *target, int n){
+  int i = 0, n = get_size(file);
+  int len;
+  char *array[n];
+  char buff[MAX];
+  while(fgets(buff,MAX,file) != NULL){
+    len = strlen(buff);
+    array[i] = (char*)malloc(len*sizeof(char));
+    i++;
+  }
+
+
+}
+
+int get_size(FILE *file){
+  int size = 0;
+  int cur = ftell(file);
+  fseek(file,0,SEEK_SET);
+  char buff[MAX];
+  while(fgets(buff,MAX,file) != NULL) size++;
+  fseek(file,cur,SEEK_SET);
+
+  return size;
+}

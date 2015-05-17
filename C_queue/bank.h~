@@ -1,0 +1,167 @@
+#define SERVE_TIME 15
+
+typedef struct node_s{
+  int time;
+  struct node_s *next;
+} node;
+
+int lastH = 0;
+int lastM = 0;
+
+node* makeNode(){
+  node *newNode;
+  newNode = (node*)malloc(sizeof(node));
+  if(newNode == NULL) {
+    printf("cannot create new node!\n");
+    return;
+  }
+  newNode->time = SERVE_TIME;
+  newNode->next = NULL;
+  return newNode;
+}
+
+void enqueue(node **top){
+  if(*top == NULL) *top = makeNode();
+  else {
+    node *newNode;
+    newNode = makeNode();
+    newNode->next = *top;
+    *top = newNode;
+  }
+}
+
+void dequeue(node **top){
+  if (*top == NULL){
+    printf("queue is empty!\n");
+    return;
+  } else {
+    node *newNode;
+    newNode = (node*)malloc(sizeof(node));
+    node *temp;
+    temp = (node*)malloc(sizeof(node));
+    temp = *top;
+    while(temp->next != NULL){
+      temp = temp->next;
+    }
+    newNode = *top;
+    while(newNode->next != temp){
+      newNode = newNode->next;
+    }
+    newNode->next = NULL;
+    free(temp);
+  }
+}
+
+int countQueue(node **top){
+  int count = 0;
+  if (*top == NULL) {
+    printf("None in this queue!\n");
+    return 0;
+  } else {
+    node *newNode;
+    newNode = (node*)malloc(sizeof(node));
+    newNode = *top;
+    do{
+      count++;
+      newNode = newNode->next;
+    } while(newNode != NULL);
+    free(newNode);
+  }
+  return count;
+}
+
+void search_and_destroy(node **top, int h1, int m1, int h2, int m2){
+  int i;
+  if (*top == NULL){
+    printf("No customer in the line\n");
+    return;
+  } else {
+    if ((h2-h1)*60 + (m2-m1) < (*top)->time){
+        (*top)->time -= ((h2-h1)*60 + (m2-m1));
+      } else {
+        int odd = ((h2-h1)*60 + (m2-m1)) % SERVE_TIME;
+        int n = ((h2-h1)*60 + (m2-m1)) / SERVE_TIME;
+        for(i = 0; i < n; i++)
+          dequeue(&(*top));
+        (*top)->time -= odd;
+      }
+  }
+}
+
+
+void process(node **top1, node **top2, int *count){
+  int h,m,n;
+  if((lastH == 0) && (lastM == 0)){
+    printf("Enter current time: (hh:mm): ");
+    scanf("%d:%d",&h,&m);
+    printf("\nEnter number of new customers: ");
+    scanf("%d",&n);
+    lastH = h; lastM = m;
+  } else {
+    printf("Enter current time: (hh:mm): ");
+    scanf("%d:%d",&h,&m);
+    printf("\nEnter number of new customers: ");
+    scanf("%d",&n);
+  }
+  if ((*count) == 0){
+    if (n % 2 == 0){
+      int i = 0;
+      while(i < n){
+        printf("Customer number %d wait in line 1 for %d minutes\n",i+1,(i%2+i/2)*SERVE_TIME);
+        enqueue(&(*top1));
+        printf("Customer number %d wait in line 2 for %d minutes\n",i+2,(i/2)*SERVE_TIME);
+        enqueue(&(*top2));
+        i += 2;
+      }
+    } else {
+      int i = 0;
+      printf("Customer number %d wait in line 1 for %d minutes\n",i+1,(i%2+i/2)*SERVE_TIME);
+      enqueue(&(*top1));
+      n -= 1;
+      i++;
+      while(i < n){
+        printf("Customer number %d wait in line 2 for %d minutes\n",i+1,(i/2)*SERVE_TIME);
+        enqueue(&(*top2));
+        printf("Customer number %d wait in line 1 for %d minutes\n",i+2,(i%2+i/2)*SERVE_TIME);
+        enqueue(&(*top1));
+        i += 2;
+      }
+    }
+    (*count)++;
+  } else {
+    int out1,out2;
+    search_and_destroy(&(*top1),lastH,lastM,h,m);
+    search_and_destroy(&(*top2),lastH,lastM,h,m);
+    printf("%d\n",countQueue(&(*top1)));
+    if(countQueue(&(*top1)) >= countQueue(&(*top2))){
+      int i = 0;
+      while (i < n){
+        printf("Customer %d wait in line 2 for %d minutes\n",i+1,(countQueue(&(*top2)) - 1)*SERVE_TIME+(*top2)->time);
+        enqueue(&(*top2));
+        printf("Customer %d wait in line 1 for %d minutes\n",i+2,(countQueue(&(*top1)) - 1)*SERVE_TIME+(*top1)->time);
+        enqueue(&(*top2));
+        i += 2;
+      }
+    } else {
+      int i = 0;
+      while (i < n){
+        printf("Customer %d wait in line 1 for %d minutes\n",i+1,(countQueue(&(*top1)) - 1)*SERVE_TIME+(*top1)->time);
+        enqueue(&(*top2));
+        printf("Customer %d wait in line 2 for %d minutes\n",i+2,(countQueue(&(*top2)) - 1)*SERVE_TIME+(*top2)->time);
+        enqueue(&(*top2));
+        i += 2;
+      }
+    }
+  }
+}
+
+void print_status(node **top1, node **top2){
+  int n1 = countQueue(&(*top1));
+  int n2 = countQueue(&(*top2));
+  printf("Customer waiting in line 1: %d\n", n1 - 1);
+  printf("Customer waiting in line 2: %d\n", n2 - 1);
+
+  printf("Total waiting time in line 1: %d\n", (n1 - 1)*SERVE_TIME + (*top1)->time);
+  printf("Total waiting time in line 2: %d\n", (n2 - 1)*SERVE_TIME + (*top2)->time);
+}
+

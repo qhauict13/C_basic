@@ -1,0 +1,89 @@
+#include"stacknode.h"
+#include"stringnode.h"
+#include"postfix.h"
+#include"tree.h"
+int postfixsolution(stringnode *root)
+{
+	stringnode *mediate=NULL;
+	stringnode* cur=root;
+	int n,n1,n2;
+	while(1)
+	{
+		if (cur==NULL)
+		{
+			n = atoi(mediate->data);
+			return n;
+		}
+		if (!discriminate(cur->data))  mediate = stringpush(mediate,cur->data);
+		else if (discriminate(cur->data))
+		{
+			n2 = atoi(mediate->data);
+			mediate = stringpop(mediate);
+			n1 = atoi(mediate->data);
+			mediate = stringpop(mediate);
+			if (!strcmp(cur->data,"*")) n = n1*n2;
+			else if (!strcmp(cur->data,"*")) n = n1*n2;
+			else if (!strcmp(cur->data,"/")) {if(n2==0) {printf("Math error.\n");return -9999999;}n = n1/n2;}
+			else if (!strcmp(cur->data,"+")) n = n1+n2;
+			else if (!strcmp(cur->data,"-")) n = n1-n2;
+			else if (!strcmp(cur->data,"%")) n = n1%n2;
+			mediate = stringpush(mediate,atostr(n));
+			
+		}
+		cur = cur->next;
+	}
+}
+void maketree(char *ex){
+  char *part=NULL;
+  stringnode *output=NULL;
+  treenode *tree=NULL;
+  char *part1,*part2;
+  int n = 0;
+  while(1){
+    part=partcut(ex);
+    if(!discriminate(part)) output=stringpush(output,part);
+    else if(discriminate(part)&&n==0){
+      part1=output->data;
+      output=stringpop(output);
+      part2=output->data;
+      output=stringpop(output);
+      treenode *left = makeTreeNode(part1);
+      treenode *right = makeTreeNode(part2);
+      tree = makeTreeNode(part);
+      tree = createFromSub(tree,left,right);
+      n++;
+    }
+    else if(discriminate(part)&&n!=1){
+      part1=output->data;
+      output=stringpop(output);
+      treenode *left = makeTreeNode(part1);
+      treenode *newtree = makeTreeNode(part);
+      newtree = createFromSub(newtree,tree,left);
+      tree = newtree;
+    }
+  }
+}
+int main()
+{
+	stringnode *output=NULL;
+	char expression[1000];
+	char *ex;
+	int k;
+	int n;
+	while(1)
+	{
+	printf("\n\n\nInput the expression : ");
+	gets(expression);
+	ex = transform(expression);
+	ex = stringfix(ex);
+	printf("ex= %s\n",ex);
+	if (check(ex))
+          
+	else printf("Math error.\n",check(ex));
+	printf("Do you wanna continue ? (1:Yes)\n");
+	scanf("%d",&k);while(getchar()!='\n');
+	if(k!=1) break; 
+	}
+	return 1;
+	
+}

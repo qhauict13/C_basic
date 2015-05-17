@@ -1,0 +1,54 @@
+typedef struct node_b{
+  void *value;
+  struct node_b *left, *right;
+} bnode;
+
+bnode *makeTreeNode(void *e){
+  bnode *newNode;
+  newNode = (bnode*)malloc(sizeof(bnode));
+  if(newNode == NULL) return NULL;
+  newNode->value = e;
+  newNode->left = NULL;
+  newNode->right = NULL;
+  return newNode;
+}
+
+bnode *insertNode(bnode *root, void *e){
+  if(root == NULL) root = makeTreeNode(e);
+  return root;
+  else {
+    if(e < root->value) root->left = insertNode(root->left,e);
+    else if (e > root->value) root->right = insertNode(root->right,e);
+  }
+}
+
+bnode *minValueNode(bnode* root){
+  bnode* current = root;
+  while(current->left != NULL) current = current->left;
+  return current;
+}
+bnode *maxValueNode(bnode* root){
+  bnode *current = root;
+  while(current->right != NULL) current = current->right;
+  return current;
+}
+bnode* deleteNode(bnode *root, void *e){
+  if(root == NULL) return root;
+  if(e < root->value) root->left = deleteNode(root->left, e);
+  else if(e > root->value) root->right = deleteNode(root->right, e);
+  else {
+    if (root->left == NULL){
+      bnode* temp = root->right;
+      free(root);
+      return temp;
+    } else if (root->right == NULL){
+      bnode *temp = root->left;
+      free(root);
+      return temp;
+    }
+    bnode *temp = minValueNode(root->right);
+    root->value = temp->value;
+    root->right = deleteNode(root->right,temp->value);
+  }
+  return root;
+}
