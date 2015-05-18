@@ -23,9 +23,17 @@ bnode *maxValueNode(bnode* root){
   while(current->right != NULL) current = current->right;
   return current;
 }
-
+//--------compare 2 values-----------
+/*
+int cmp(const void *a, const void *b){
+  char *a1 = ((wordCount*)a)->word;
+  char *b1 = ((wordCount*)b)->word;
+  //printf("%s - %s",a1,b1);
+  return strcmp(a1,b1);
+}
+*/
 //----------searching function-----------
-bnode *search(bnode **root, void *e){
+/*bnode *search(bnode **root, void *e){
   if(e == NULL) {
     fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
     return NULL;
@@ -36,7 +44,7 @@ bnode *search(bnode **root, void *e){
   if(c == 0) return (*root);
   if(c < 0) (*root)->left = search(&((*root)->left),e);
   if(c > 0) (*root)->right = search(&((*root)->right),e);
-}
+  }*/
 //-------insert node (have value)---------------
 void insertNode(bnode **root, void *e){
   int c;
@@ -108,10 +116,10 @@ int isLeaf(bnode *node){
   return 0;
 }
 //----------create a node from 2 nodes-----------
-bnode *createFrom2(bnode *root, bnode* l, bnode *r){
-  root->left = l;
-  root->right = r;
-  return root;
+bnode *createFromSub(bnode **root,bnode *l, bnode *r){
+  (*root)->left = l;
+  (*root)->right = r;
+  return *root;
 }
 
 bnode *addleftMost(bnode *root, void *e){
