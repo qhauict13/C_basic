@@ -33,11 +33,27 @@ bnode *search(bnode **root, void *e){
   if((*root) == NULL) return NULL;
   int c;
   c = cmp(e,(*root)->value);
-
   if(c == 0) return (*root);
   if(c < 0) (*root)->left = search(&((*root)->left),e);
   if(c > 0) (*root)->right = search(&((*root)->right),e);
 }
+//-------insert node (have value)---------------
+void insertNode(bnode **root, void *e){
+  int c;
+  if(e == NULL) {
+    fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
+    return;
+  }
+  if((*root) == NULL){
+    *root = makeTreeNode(e);
+    return;
+  } else {
+    c = cmp(e,(*root)->value);
+    if (c < 0) insertNode(&((*root)->left),e);
+    if (c > 0) insertNode(&((*root)->right),e);
+  }
+}
+
 //--------delete Node---------------
 void deleteNode(bnode **root, void *e){
   bnode *parent, *x , *target = NULL;

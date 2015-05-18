@@ -28,25 +28,10 @@ char *partcut(char *ex){
 int cmp(const void *a, const void *b){
   char *a1 = ((wordCount*)a)->word;
   char *b1 = ((wordCount*)b)->word;
+  //printf("%s - %s",a1,b1);
   return strcmp(a1,b1);
 }
 
-//-------insert node (have value)---------------
-void insertNode(bnode **root, void *e){
-  int c;
-  if(e == NULL) {
-    fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
-    return;
-  }
-  if((*root) == NULL){
-    *root = makeTreeNode(e);
-    return;
-  } else {
-    c = cmp(e,(*root)->value);
-    if (c < 0) insertNode(&((*root)->left),e);
-    if (c > 0) insertNode(&((*root)->right),e);
-  }
-}
 
 //---------print nodes and tree in various ways----------
 void printNode(bnode *node){
@@ -94,7 +79,7 @@ int main(){
     char str[MAX];
     char *part = NULL;
     bnode *temp;
-    if(fgets(str,MAX,file) != NULL) printf("\n");
+    if(fgets(str,MAX,file) != NULL) printf("File scanned!\n");
     char ex[MAX];
     strcpy(ex,str);
     while(ex != NULL){
@@ -107,38 +92,30 @@ int main(){
     part = NULL; i = 0;
 
     while(str != NULL){
+      part = partcut(str);
+      if(part == NULL) break;
+
       if(root == NULL){
-        part = partcut(str);
-        if(part == NULL) break;
         strcpy(b[i].word,part);
         b[i].count = 0;
         insertNode(&root,(void*)&b[i]);
-        printNode(root);
       } else {
-        part = partcut(str);
-        if(part == NULL) break;
-
         strcpy(b[i].word,part);
         b[i].count = 0;
-        temp = search(&root,(void*)&b[i]);
+        temp = search(&root,(void*)&b[i]); //only search for word match
+        //--------down check-----------
 
-        if(temp == NULL) {
-          insertNode(&root,(void*)&b[i]);
-
+        if(temp == NULL) { //if no matching word is found
+          insertNode(&root,(void*)&b[i]); //insert this word with count = 0
         }
         else{
-          b[i].count = ((wordCount*)(temp->value))->count;
-          //printf("%s - %d\n",b[i].word,b[i].count);
-          deleteNode(&root,(void*)(b[i].word));
-          b[i].count += 1;
-          insertNode(&root,(void*)&b[i]);
+          ((wordCount*)(temp->value))->count += 1;
           }
-          }
+        }
       i++;
     }
-    printf("Inorder traversal: \n");
+    preorder(root);
     free(b);
-    inorder(root);
     freeAll(root);
   return 0;
 }
