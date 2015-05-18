@@ -28,7 +28,6 @@ char *partcut(char *ex){
 int cmp(const void *a, const void *b){
   char *a1 = ((wordCount*)a)->word;
   char *b1 = ((wordCount*)b)->word;
-  printf("%s - %s\n",a1,b1);
   return strcmp(a1,b1);
 }
 
@@ -100,14 +99,12 @@ int main(){
     strcpy(ex,str);
     while(ex != NULL){
       part = partcut(ex);
+      if(part == NULL) break;
       i++;
     }
-    printf("%d\n",i);
 
     wordCount *b = malloc(i*sizeof(wordCount));
     part = NULL; i = 0;
-
-
 
     while(str != NULL){
       if(root == NULL){
@@ -123,25 +120,25 @@ int main(){
 
         strcpy(b[i].word,part);
         b[i].count = 0;
-        temp = search(root,(void*)&b[i]);
-        /*
+        temp = search(&root,(void*)&b[i]);
+
         if(temp == NULL) {
-          insertNode(&root,(void*)&a);
+          insertNode(&root,(void*)&b[i]);
+
         }
         else{
-          strcpy(b.word,((wordCount*)(temp->value))->word);
-          b.count = ((wordCount*)(temp->value))->count;
-          //printf("%s(%d)\n",b.word,b.count);
-          deleteNode(&root,(void*)(b.word));
-          b.count += 1;
-          insertNode(&root,(void*)&b);
-          }*/
-      }
+          b[i].count = ((wordCount*)(temp->value))->count;
+          //printf("%s - %d\n",b[i].word,b[i].count);
+          deleteNode(&root,(void*)(b[i].word));
+          b[i].count += 1;
+          insertNode(&root,(void*)&b[i]);
+          }
+          }
       i++;
     }
     printf("Inorder traversal: \n");
     free(b);
-    //inorder(root);
+    inorder(root);
     freeAll(root);
   return 0;
 }

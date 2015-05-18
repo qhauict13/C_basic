@@ -25,17 +25,18 @@ bnode *maxValueNode(bnode* root){
 }
 
 //----------searching function-----------
-bnode *search(bnode *root, void *e){
+bnode *search(bnode **root, void *e){
   if(e == NULL) {
     fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
     return NULL;
   }
-  if(root == NULL) return NULL;
+  if((*root) == NULL) return NULL;
   int c;
-  c = cmp(e,root->value);
-  if(c == 0) return root;
-  if(c < 0) root->left = search(root->left,e);
-  if(c > 0) root->right = search(root->right,e);
+  c = cmp(e,(*root)->value);
+
+  if(c == 0) return (*root);
+  if(c < 0) (*root)->left = search(&((*root)->left),e);
+  if(c > 0) (*root)->right = search(&((*root)->right),e);
 }
 //--------delete Node---------------
 void deleteNode(bnode **root, void *e){
@@ -45,7 +46,7 @@ void deleteNode(bnode **root, void *e){
     printf("\nTree is empty\n");
     return;
   }
-  target = search(*root,e);
+  target = search(&(*root),e);
 
   if(target == NULL){
     return;
