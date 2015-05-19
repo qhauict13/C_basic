@@ -2,6 +2,8 @@ typedef struct node_b{
   void *value;
   struct node_b *left, *right;
 } bnode;
+
+
 //-----------make a tree node-----------------
 bnode *makeTreeNode(void *e){
   bnode *newNode;
@@ -23,17 +25,10 @@ bnode *maxValueNode(bnode* root){
   while(current->right != NULL) current = current->right;
   return current;
 }
-//--------compare 2 values-----------
+
 /*
-int cmp(const void *a, const void *b){
-  char *a1 = ((wordCount*)a)->word;
-  char *b1 = ((wordCount*)b)->word;
-  //printf("%s - %s",a1,b1);
-  return strcmp(a1,b1);
-}
-*/
 //----------searching function-----------
-/*bnode *search(bnode **root, void *e){
+bnode *search(bnode **root, void *e){
   if(e == NULL) {
     fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
     return NULL;
@@ -41,28 +36,28 @@ int cmp(const void *a, const void *b){
   if((*root) == NULL) return NULL;
   int c;
   c = cmp(e,(*root)->value);
+  //printf("    %d\n",c);
   if(c == 0) return (*root);
-  if(c < 0) (*root)->left = search(&((*root)->left),e);
-  if(c > 0) (*root)->right = search(&((*root)->right),e);
-  }*/
+  if(c < 0) return search(&((*root)->left),e);
+  if(c > 0) return search(&((*root)->right),e);
+  }
 //-------insert node (have value)---------------
 void insertNode(bnode **root, void *e){
   int c;
-  if(e == NULL) {
+  if(e == NULL || root == NULL) {
     fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
     return;
   }
   if((*root) == NULL){
-    *root = makeTreeNode(e);
+    (*root) = makeTreeNode(e);
     return;
-  } else {
+  }
     c = cmp(e,(*root)->value);
     if (c < 0) insertNode(&((*root)->left),e);
-    if (c > 0) insertNode(&((*root)->right),e);
-  }
-}
-
+    else if (c > 0) insertNode(&((*root)->right),e);
+    }*/
 //--------delete Node---------------
+/*
 void deleteNode(bnode **root, void *e){
   bnode *parent, *x , *target = NULL;
   parent = x = NULL;
@@ -106,7 +101,7 @@ void deleteNode(bnode **root, void *e){
     return;
   }
 }
-
+*/
 //---------is a node a leaf?----------------
 int isLeaf(bnode *node){
   if(node == NULL) return 0;

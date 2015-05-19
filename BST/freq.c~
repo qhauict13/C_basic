@@ -2,19 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include "BST.h"
-#include <ctype.h>
 #define MAX 1000
 
 typedef struct{
   int count;
   char word[30];
 } wordCount ;
-
 //-----------cut parts out of a string-------
 char *partcut(char *ex){
   int i = 0, j = 0,k;
   if(strlen(ex) == 0) return NULL;
-  while(isalpha(ex[i])) i++;
+  while(ex[i]!=' '&&i<strlen(ex)&&ex[i]!='\n') i++;
   char *b = (char*)malloc(i*sizeof(char));
   for (j = 0; j < i; j++) {
     b[j]=ex[j];
@@ -33,6 +31,7 @@ int cmp(const void *a, const void *b){
   //printf("%s - %s",a1,b1);
   return strcmp(a1,b1);
 }
+
 
 //---------print nodes and tree in various ways----------
 void printNode(bnode *node){
@@ -68,18 +67,6 @@ void freeAll(bnode *root){
   freeAll(root->right);
   free(root);
 }
-void mirror(bnode *root){
-  if(root == NULL) return;
-  else {
-    bnode *temp;
-    mirror(root->left);
-    mirror(root->right);
-
-    temp = root->left;
-    root->left = root->right;
-    root->right = temp;
-  }
-}
 //----------main-------------
 int main(){
   FILE *file;
@@ -107,14 +94,16 @@ int main(){
     while(str != NULL){
       part = partcut(str);
       if(part == NULL) break;
+
       if(root == NULL){
         strcpy(b[i].word,part);
-        b[i].count = 1;
+        b[i].count = 0;
         insertNode(&root,(void*)&b[i]);
       } else {
         strcpy(b[i].word,part);
-        b[i].count = 1;
+        b[i].count = 0;
         temp = search(&root,(void*)&b[i]); //only search for word match
+        //--------down check-----------
 
         if(temp == NULL) { //if no matching word is found
           insertNode(&root,(void*)&b[i]); //insert this word with count = 0
@@ -124,7 +113,6 @@ int main(){
           }
         }
       i++;
-
     }
     preorder(root);
     free(b);
