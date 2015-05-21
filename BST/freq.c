@@ -3,7 +3,7 @@
 #include <string.h>
 #include "BST.h"
 #include <ctype.h>
-#define MAX 1000
+#define MAX 10000
 
 typedef struct{
   int count;
@@ -62,37 +62,41 @@ void postorder(bnode *root){
   postorder(root->right);
   printNode(root);
 }
+void writeToFile(bnode *root, FILE *file){
+  if (root == NULL) return;
+  char *e = ((wordCount*)(root->value))->word;
+  int e1 = ((wordCount*)(root->value))->count;
+  fprintf(file,"%s(%d)\n",e,e1);
+  writeToFile(root->left,file);
+  writeToFile(root->right,file);
+}
 void freeAll(bnode *root){
   if(root == NULL) return;
   freeAll(root->left);
   freeAll(root->right);
   free(root);
 }
-void mirror(bnode *root){
-  if(root == NULL) return;
-  else {
-    bnode *temp;
-    mirror(root->left);
-    mirror(root->right);
 
-    temp = root->left;
-    root->left = root->right;
-    root->right = temp;
-  }
-}
 //----------main-------------
 int main(){
-  FILE *file;
+  FILE *file, *file1;
   if((file = fopen("duplicate_words","r")) == NULL) {
     fprintf(stderr,"Cannot open file!\n");
     exit(1);
   }
+  else if((file1 = fopen("wordcounting.txt","w")) == NULL){
+    fprintf(stderr,"cannot create file!\n");
+    exit(1);
+  }
   int i = 0;
     bnode *root = NULL;
+    char buff[MAX];
     char str[MAX];
     char *part = NULL;
     bnode *temp;
-    if(fgets(str,MAX,file) != NULL) printf("File scanned!\n");
+    while (fgets(buff,MAX,file) != NULL) {
+      strcat(str,buff);
+    }
     char ex[MAX];
     strcpy(ex,str);
     while(ex != NULL){
@@ -127,6 +131,7 @@ int main(){
 
     }
     preorder(root);
+    writeToFile(root,file1);
     free(b);
     freeAll(root);
   return 0;

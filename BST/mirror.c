@@ -19,10 +19,9 @@ char *partcut(char *ex)
   return b;
 }
 //--------compare 2 values-----------
-/*
 int cmp(const void *a, const void *b){
-
-}*/
+  return 1;
+}
 //----pretty transform an expression---------
 char *transform(char *a)
 {
@@ -79,12 +78,13 @@ int isOperandCheck(char a){
 }
 int prec(char *e) {
   int pre = 0;
-  if (!strcmp(e,"*") || !strcmp(e,"/") || !strcmp(e,"^"))
+  if (!strcmp(e,"*") || !strcmp(e,"/"))
     pre = 2;
   else if (!strcmp(e,"-") || !strcmp(e,"+"))
     pre = 1;
-  else
+  else if(!strcmp(e,"^"))
     pre = 3;
+  else pre = -1;
   return pre;
 }
 //------check validity of an expression-----------
@@ -116,7 +116,10 @@ stacknode *infix2postfix(char *ex){
     if(part==NULL) break;
     if (isNumeric(part)) push(&output,(void*)part);
 
-    else if (!strcmp(part,"(")) push(&temp,(void*)part);
+    else if (!strcmp(part,"(")) {
+      push(&temp,(void*)part);
+    }
+
     else if (!strcmp(part,")")){
       while(temp != NULL && strcmp((char*)(temp->value),"(")) {
         a = temp;
@@ -140,51 +143,38 @@ stacknode *infix2postfix(char *ex){
     push(&output,a->value);
     pop(&temp);
   }
-
-  //reverse(&output);
-  printStack(output);
+  reverse(&output);
   return output;
 }
-/*
-void mirror(bnode *root){
-  if(root == NULL) return;
-  else {
-    bnode *temp;
-    mirror(root->left);
-    mirror(root->right);
 
-    temp = root->left;
-    root->left = root->right;
-    root->right = temp;
-  }
-}
-*/
 bnode* maketree(bnode **tree, stacknode *input){
   char *part=NULL;
   stacknode *output=NULL;
-  char *part1,*part2;
+  stacknode *part1 = malloc(sizeof(stacknode));
+  stacknode *part2 = malloc(sizeof(stacknode));
   int n = 0;
   while(1){
     if(input == NULL) break;
-    part=input->value;
+    part=(char*)(input->value);
     pop(&input);
-    if(!isOperand(part)) push(&output,(void*)part);
+    //---------------------------------------------
+    if(isNumeric(part)) push(&output,(void*)part);
     else if(isOperand(part)&&n==0){
-      part1=(char*)(output->value);
+      part1->value = output->value;
       pop(&output);
-      part1=(char*)(output->value);
+      part2->value = output->value;
       pop(&output);
 
-      bnode *left = makeTreeNode((void*)part1);
-      bnode *right = makeTreeNode((void*)part2);
+      bnode *left = makeTreeNode(part1->value);
+      bnode *right = makeTreeNode(part2->value);
       *tree = makeTreeNode((void*)part);
       *tree = createFromSub(tree,left,right);
       n++;
     }
     else if(isOperand(part)&&(n!=0)){
-      part1=(char*)(output->value);
+      part1->value = output->value;
       pop(&output);
-      bnode *left = makeTreeNode((void*)part1);
+      bnode *left = makeTreeNode(part1->value);
       bnode *newtree = makeTreeNode((void*)part);
       newtree = createFromSub(&newtree,(*tree),left);
       *tree = newtree;
@@ -192,11 +182,37 @@ bnode* maketree(bnode **tree, stacknode *input){
   }
   return *tree;
 }
+//--------------mirror a tree-------------
+  void mirror(bnode *root){
+  if(root == NULL) return;
+  else {
+  bnode *temp;
+  mirror(root->left);
+  mirror(root->right);
+
+  temp = root->left;
+  root->left = root->right;
+  root->right = temp;
+  }
+}
+//-----------print a node---------------
+void printNode(bnode **node){
+  if(*node == NULL) {
+    fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
+    return;
+  }
+  printf("%s\n",(char*)((*node)->value));
+}
+void preorder(bnode *root){
+  if(root == NULL) return;
+  printNode(&root);
+  preorder(root->left);
+  preorder(root->right);
+}
 
 int main(int argc, char *argv[])
 {
   int option = 0;
-  int ass = 1;
   stacknode *output = NULL;
   bnode *root = NULL;
   char inputString[MAX];
@@ -208,7 +224,12 @@ int main(int argc, char *argv[])
     printf("expression = %s\n",ex);
     if(check(ex)){
       output = infix2postfix(ex);
-      //root = maketree(&root,output);
+      root = maketree(&root,output);
+      printf("Preorder the tree before reversing:\n");
+      preorder(root);
+      mirror(root);
+      printf("Preorder the tree after reversing:\n");
+      preorder(root);
     }
     else printf("Math error!\n");
     printf("Do you want to continue? (1=yes): ");

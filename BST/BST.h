@@ -26,7 +26,6 @@ bnode *maxValueNode(bnode* root){
   return current;
 }
 
-/*
 //----------searching function-----------
 bnode *search(bnode **root, void *e){
   if(e == NULL) {
@@ -44,20 +43,19 @@ bnode *search(bnode **root, void *e){
 //-------insert node (have value)---------------
 void insertNode(bnode **root, void *e){
   int c;
-  if(e == NULL || root == NULL) {
+  if(e == NULL) {
     fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
     return;
   }
-  if((*root) == NULL){
+  if(*root == NULL){
     (*root) = makeTreeNode(e);
     return;
   }
     c = cmp(e,(*root)->value);
     if (c < 0) insertNode(&((*root)->left),e);
     else if (c > 0) insertNode(&((*root)->right),e);
-    }*/
+}
 //--------delete Node---------------
-/*
 void deleteNode(bnode **root, void *e){
   bnode *parent, *x , *target = NULL;
   parent = x = NULL;
@@ -101,7 +99,7 @@ void deleteNode(bnode **root, void *e){
     return;
   }
 }
-*/
+
 //---------is a node a leaf?----------------
 int isLeaf(bnode *node){
   if(node == NULL) return 0;
@@ -140,4 +138,3 @@ bnode *addRightMost(bnode *root, void *e){
 
   return newNode;
 }
-

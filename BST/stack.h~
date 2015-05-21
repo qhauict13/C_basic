@@ -11,7 +11,7 @@ stacknode* makeStackNode(void *e){
   newNode -> next = NULL;
   return newNode;
 }
-//---------------push------------------
+
 void push(stacknode **top, void *e){
   if(*top == NULL){
     *top = makeStackNode(e);
@@ -22,7 +22,7 @@ void push(stacknode **top, void *e){
   newNode -> next = *top;
   *top = newNode;
 }
-//--------------pop-------------------
+
 void pop(stacknode **top){
   if (*top == NULL){
     fprintf(stderr,"ERROR: in %s on line %d\n",__FILE__,__LINE__);
@@ -34,11 +34,11 @@ void pop(stacknode **top){
     free(newNode);
   }
 }
+
 //------traverse a stack-----------
 void printStack(stacknode **root){
   if(*root == NULL){
     fprintf(stderr,"error in %s at line %d\n",__FILE__,__LINE__);
-	return;
   }
   stacknode *temp;
   temp = *root;
